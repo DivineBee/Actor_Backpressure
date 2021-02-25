@@ -13,7 +13,6 @@
 - [Status](#status)
 
 ## Requirements
-* To reuse the first Lab, with some additions.
 * Copy the Dynamic Supervisor + Workers that compute the sentiment score and adapt this copy of the system to compute the  
 Engagement Ratio per Tweet. Notice that some tweets are actually retweets and contain a special field retweet_status​.  
 You will have to extract it and treat it as a separate tweet. The Engagement Ratio will be computed as: (#favorites + #retweets) / #followers​ .
