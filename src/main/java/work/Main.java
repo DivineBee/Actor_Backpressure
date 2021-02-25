@@ -4,6 +4,7 @@ import actor.model.ActorFactory;
 import actor.model.DeadException;
 import actor.model.Supervisor;
 import behaviours.EmotionHandler;
+import behaviours.EngagementRatioBehaviour;
 import behaviours.SSEClientBehaviour;
 
 /**
@@ -18,10 +19,10 @@ public class Main {
 
         ActorFactory.createActor("firstSSEClient", sseClientBehaviour);
         ActorFactory.createActor("secondSSEClient", sseClientBehaviour);
-        ActorFactory.createActor("em", emotionHandler);
+        ActorFactory.createActor("emotionHandler", emotionHandler);
 
         Supervisor.sendMessage("firstSSEClient", "http://localhost:4000/tweets/1");
         Supervisor.sendMessage("secondSSEClient", "http://localhost:4000/tweets/2");
-        Supervisor.sendMessage("em", "B:\\PROGRAMMING\\PROJECTS\\ActorProg1\\src\\main\\resources\\emotions.txt");
+        Supervisor.sendMessage("emotionHandler", "B:\\PROGRAMMING\\PROJECTS\\ActorProg1\\src\\main\\resources\\emotions.txt");
     }
 }
