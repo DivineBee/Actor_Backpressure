@@ -1,7 +1,9 @@
 package behaviours;
 
 import actor.model.Actor;
+import actor.model.ActorFactory;
 import actor.model.Behaviour;
+import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -13,6 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JSONBehaviour implements Behaviour<String> {
     public static String tweet = null;
     public static String user = null;
+    public static int favorites = 0;
+    public static int followers = 0;
+    public static int numberOfRetweets = 0;
 
     @Override
     public boolean onReceive(Actor<String> self, String data) throws Exception {
@@ -39,6 +44,24 @@ public class JSONBehaviour implements Behaviour<String> {
             JsonNode userNode = jsonNode.get("message").get("tweet").get("user").get("screen_name");
             user = userNode.asText();
 
+            if (data.contains("retweeted_status")) {
+                // extract retweet and save to variable
+                JsonNode retweetFavoritesNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("user").get("favourites_count");
+                favorites = retweetFavoritesNode.asInt();
+
+                // extract folllowers and save to variable
+                JsonNode retweetFollowersNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("user").get("followers_count");
+                followers = retweetFollowersNode.asInt();
+
+                // extract retweets and save to variable
+                JsonNode retweetCountNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("retweet_count");
+                numberOfRetweets = retweetCountNode.asInt();
+
+                EngagementRatioBehaviour ratioBehaviour = new EngagementRatioBehaviour();
+                ActorFactory.createActor("ratio", ratioBehaviour);
+                Supervisor.sendMessage("ratio", tweet);
+            }
+            //System.out.println("DATA" + data + favorites);
             // print beautifully the output
             System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
         }
