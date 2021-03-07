@@ -7,11 +7,13 @@ package behaviours;
 
 import actor.model.Actor;
 import actor.model.Behaviour;
+import actor.model.Supervisor;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 
+import static behaviours.JSONBehaviour.tweet;
 import static behaviours.JSONBehaviour.user;
 
 public class EmotionHandler implements Behaviour<String> {
@@ -143,6 +145,10 @@ public class EmotionHandler implements Behaviour<String> {
             System.out.println(key + ":" + emotionsMap.get(key));
         }
         reader.close();
+
+        // id, score
+        EmotionWithId emotionWithId = new EmotionWithId(tweetWithId.getId(), getEmotionScore(tweet));
+        Supervisor.sendMessage("aggregator", emotionWithId);
         return false;
     }
 
@@ -152,3 +158,8 @@ public class EmotionHandler implements Behaviour<String> {
         self.die();
     }
 }
+// id tweet
+// id score
+// id ratio
+
+//id

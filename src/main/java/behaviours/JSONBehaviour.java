@@ -1,7 +1,6 @@
 package behaviours;
 
 import actor.model.Actor;
-import actor.model.ActorFactory;
 import actor.model.Behaviour;
 import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,12 +56,17 @@ public class JSONBehaviour implements Behaviour<String> {
                 JsonNode retweetCountNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("retweet_count");
                 numberOfRetweets = retweetCountNode.asInt();
 
-                EngagementRatioBehaviour ratioBehaviour = new EngagementRatioBehaviour();
-                ActorFactory.createActor("ratio", ratioBehaviour);
                 Supervisor.sendMessage("ratio", tweet);
             }
             //System.out.println("DATA" + data + favorites);
             // print beautifully the output
+
+            //1st field id, tweet
+            TweetWithId tweetWithId = new TweetWithId(tweet, favorites, followers, numberOfRetweets );
+
+            Supervisor.sendMessage("aggregator", tweetWithId);
+            Supervisor.sendMessage("emotionScoreCalculator", tweetWithId);
+            Supervisor.sendMessage("tweetEngagementRatio", tweetWithId);
             System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
         }
         return true;
