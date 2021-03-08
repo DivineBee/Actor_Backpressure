@@ -5,6 +5,7 @@ import actor.model.Behaviour;
 import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.TweetWithId;
 
 /**
  * @author Beatrice V.
@@ -55,19 +56,19 @@ public class JSONBehaviour implements Behaviour<String> {
                 // extract retweets and save to variable
                 JsonNode retweetCountNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("retweet_count");
                 numberOfRetweets = retweetCountNode.asInt();
-
-                Supervisor.sendMessage("ratio", tweet);
             }
             //System.out.println("DATA" + data + favorites);
             // print beautifully the output
 
             //1st field id, tweet
-            TweetWithId tweetWithId = new TweetWithId(tweet, favorites, followers, numberOfRetweets );
+            TweetWithId tweetWithId = new TweetWithId(tweet, favorites, followers, numberOfRetweets);
 
-            Supervisor.sendMessage("aggregator", tweetWithId);
+//            Supervisor.sendMessage("aggregator", tweetWithId);
             Supervisor.sendMessage("emotionScoreCalculator", tweetWithId);
             Supervisor.sendMessage("tweetEngagementRatio", tweetWithId);
-            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
+//            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
+
+            System.out.println(tweetWithId);
         }
         return true;
     }

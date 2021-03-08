@@ -27,7 +27,7 @@ public class Supervisor {
         Actor<Object> receiver = actorPool.get(idReceiver);
 
         if (receiver == null) {
-            System.err.println("Don't have this actor --> " + receiver);
+            System.err.println("Don't have this actor --> " + idReceiver);
         } else if (!receiver.takeMessage(message)) { // if it can't receive the message
             System.err.println("Actor " + idReceiver + " can't receive message");
             return false;

@@ -7,18 +7,67 @@ package behaviours;
 
 import actor.model.Actor;
 import actor.model.Behaviour;
-import actor.model.Supervisor;
+import utilities.EmotionWithId;
+import utilities.TweetWithId;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
-import static behaviours.JSONBehaviour.tweet;
 import static behaviours.JSONBehaviour.user;
 
-public class EmotionHandler implements Behaviour<String> {
+public class EmotionHandler implements Behaviour<TweetWithId> {
     // key-value pairs for emotions with their points
     public static final HashMap<String, Integer> emotionsMap = new HashMap<String, Integer>();
+
+    public static String[] emotionWordsArray = null;
+
+    public EmotionHandler(String pathToEmotionDbFile) throws IOException {
+        String line;
+        BufferedReader reader = new BufferedReader(new FileReader(pathToEmotionDbFile));
+        // while we have something to read
+        while ((line = reader.readLine()) != null) {
+            // remove whitespaces from beginning and end
+            line = line.trim();
+            // replace multiple whitespaces occurences with only one
+            line = line.replaceAll("\\s+", " ");
+            // temporary array for words
+            String[] parts = line.split(" ");
+            // if there are only 2 items then first is key and second value
+            // and attach them to map
+            if (parts.length == 2) {
+                String key = parts[0];
+                Integer value = Integer.parseInt(parts[1]);
+                emotionsMap.put(key, value);
+                // if more than 2 items then concatenate all the items except last one
+                // and add whitespace back
+            } else if (parts.length >= 3) {
+                String key = "";
+                for (int i = 0; i < parts.length - 1; i++) {
+                    if (key.isEmpty()) {
+                        key = key.concat(parts[i]);
+                    } else {
+                        key = key.concat(" " + parts[i]);
+                    }
+                }
+                Integer value = Integer.parseInt(parts[parts.length - 1]);
+                emotionsMap.put(key, value);
+            } else {
+                System.out.println("ignoring line: " + line);
+            }
+        }
+
+//        for (String key : emotionsMap.keySet()) {
+//            System.out.println(key + ":" + emotionsMap.get(key));
+//        }
+        reader.close();
+
+        Set setOfKeys = emotionsMap.keySet();
+        emotionWordsArray = new String[setOfKeys.size()];
+        setOfKeys.toArray(emotionWordsArray);
+    }
 
     // method which calculates the score adding up occurrences of words in the tweet
     // from the emotionsMap
@@ -27,12 +76,20 @@ public class EmotionHandler implements Behaviour<String> {
         int score = 0;
 
         // for every word/phrase from emotionMap do the next thing:
-        for (String emotionWord : emotionsMap.keySet()) {
-            String lowerCaseTweet = tweet.toLowerCase();
-            // if the word/phrase is contained inside the tweet:
-            if (lowerCaseTweet.contains(emotionWord)) {
-                // total score = number of word appearances from emotionsMap * score number for that word
-                score += amountOfEmotionWordAppearancesInTweet(tweet, emotionWord) * emotionsMap.get(emotionWord);
+//        for (String emotionWord : emotionsMap.keySet()) {
+//            String lowerCaseTweet = tweet.toLowerCase();
+//            // if the word/phrase is contained inside the tweet:
+//            if (lowerCaseTweet.contains(emotionWord)) {
+//                // total score = number of word appearances from emotionsMap * score number for that word
+//                score += amountOfEmotionWordAppearancesInTweet(tweet, emotionWord) * emotionsMap.get(emotionWord);
+//            }
+//        }
+
+        String lowerCaseTweet = tweet.toLowerCase();
+
+        for(int i = 0; i < emotionWordsArray.length; i++) {
+            if(lowerCaseTweet.contains(emotionWordsArray[i])) {
+                score += amountOfEmotionWordAppearancesInTweet(tweet, emotionWordsArray[i]) * emotionsMap.get(emotionWordsArray[i]);
             }
         }
 
@@ -101,65 +158,21 @@ public class EmotionHandler implements Behaviour<String> {
         return false;
     }
 
-
     // Mapping of emotions to keys and their points as values.
     // Here is taken into consideration that some emotions are composed from more
     // than one word (e.g dont like)
     @Override
-    public boolean onReceive(Actor<String> self, String s) throws Exception {
-        String line;
-        BufferedReader reader = new BufferedReader(new FileReader(s));
-        // while we have something to read
-        while ((line = reader.readLine()) != null) {
-            // remove whitespaces from beginning and end
-            line = line.trim();
-            // replace multiple whitespaces occurences with only one
-            line = line.replaceAll("\\s+", " ");
-            // temporary array for words
-            String[] parts = line.split(" ");
-            // if there are only 2 items then first is key and second value
-            // and attach them to map
-            if (parts.length == 2) {
-                String key = parts[0];
-                Integer value = Integer.parseInt(parts[1]);
-                emotionsMap.put(key, value);
-                // if more than 2 items then concatenate all the items except last one
-                // and add whitespace back
-            } else if (parts.length >= 3) {
-                String key = "";
-                for (int i = 0; i < parts.length - 1; i++) {
-                    if (key.isEmpty()) {
-                        key = key.concat(parts[i]);
-                    } else {
-                        key = key.concat(" " + parts[i]);
-                    }
-                }
-                Integer value = Integer.parseInt(parts[parts.length - 1]);
-                emotionsMap.put(key, value);
-            } else {
-                System.out.println("ignoring line: " + line);
-            }
-        }
-
-        for (String key : emotionsMap.keySet()) {
-            System.out.println(key + ":" + emotionsMap.get(key));
-        }
-        reader.close();
-
+    public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId){
         // id, score
-        EmotionWithId emotionWithId = new EmotionWithId(tweetWithId.getId(), getEmotionScore(tweet));
-        Supervisor.sendMessage("aggregator", emotionWithId);
-        return false;
+        EmotionWithId emotionWithId = new EmotionWithId(tweetWithId.getId(), getEmotionScore(tweetWithId.getTweet()));
+        System.out.println(emotionWithId);
+//        Supervisor.sendMessage("aggregator", emotionWithId);
+        return true;
     }
 
     @Override
-    public void onException(Actor<String> self, Exception exc) {
+    public void onException(Actor<TweetWithId> self, Exception exc) {
         exc.printStackTrace();
         self.die();
     }
 }
-// id tweet
-// id score
-// id ratio
-
-//id

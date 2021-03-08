@@ -7,6 +7,8 @@ import behaviours.EmotionHandler;
 import behaviours.EngagementRatioBehaviour;
 import behaviours.SSEClientBehaviour;
 
+import java.io.IOException;
+
 import static behaviours.JSONBehaviour.tweet;
 
 /**
@@ -15,13 +17,13 @@ import static behaviours.JSONBehaviour.tweet;
  * @project ActorProg1
  */
 public class Main {
-    public static void main(String[] args) throws DeadException {
+    public static void main(String[] args) throws DeadException, IOException {
         SSEClientBehaviour sseClientBehaviour = new SSEClientBehaviour();
-        EmotionHandler emotionHandler = new EmotionHandler();
+        EmotionHandler emotionHandler = new EmotionHandler("B:\\\\PROGRAMMING\\\\PROJECTS\\\\ActorProg1\\\\src\\\\main\\\\resources\\\\emotions.txt");
         EngagementRatioBehaviour ratioBehaviour = new EngagementRatioBehaviour();
 
         ActorFactory.createActor("tweetEngagementRatio", ratioBehaviour);
-        ActorFactory.createActor("emotionScoreCalculator", ratioBehaviour);
+        ActorFactory.createActor("emotionScoreCalculator", emotionHandler);
 
         ActorFactory.createActor("firstSSEClient", sseClientBehaviour);
         ActorFactory.createActor("secondSSEClient", sseClientBehaviour);
@@ -30,7 +32,7 @@ public class Main {
 
         Supervisor.sendMessage("firstSSEClient", "http://localhost:4000/tweets/1");
         Supervisor.sendMessage("secondSSEClient", "http://localhost:4000/tweets/2");
-        Supervisor.sendMessage("emotionHandler", "B:\\PROGRAMMING\\PROJECTS\\ActorProg1\\src\\main\\resources\\emotions.txt");
+//        Supervisor.sendMessage("emotionHandler", "B:\\PROGRAMMING\\PROJECTS\\ActorProg1\\src\\main\\resources\\emotions.txt");
        // Supervisor.sendMessage("ratioBehaviour", EmotionHandler.getEmotionScore(tweet));
     }
 }

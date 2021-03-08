@@ -1,7 +1,10 @@
 package behaviours;
 
 import actor.model.Actor;
+import actor.model.Behaviour;
 import actor.model.Supervisor;
+import utilities.RatioWithId;
+import utilities.TweetWithId;
 
 /**
  * @author Beatrice V.
@@ -10,22 +13,21 @@ import actor.model.Supervisor;
  */
 public class EngagementRatioBehaviour implements Behaviour<TweetWithId> {
     @Override
-    public boolean onReceive(Actor<String> self, TweetWithId s) throws Exception {
+    public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId) throws Exception {
+        double engagementRatio = 0;
         try {
-            double engagementRatio = 0;
-            engagementRatio = f+s/t;
-            System.out.println("f " + s.getFavorites() + "n " + s.getNumberOfRetweets() + "f " + s.getFollowers());
+            engagementRatio = (tweetWithId.getFavouritesCount() + tweetWithId.getRetweetsCount()) / tweetWithId.getFollowersCount();
         }catch (NullPointerException e){
             System.err.println("Can't calculate ratio -> 0 followers");
         }
-        System.out.println("ENGAGEMENT: " +  String.format("%.2f", engagementRatio));
-        IdWithRatio idWithRatio = new IdWithRatio(tweetWithId.getId(), ratio);
-        Supervisor.sendMessage("aggregator", idWithRatio);
-        return false;
+        RatioWithId ratioWithId = new RatioWithId(tweetWithId.getId(), engagementRatio);
+        System.out.println(ratioWithId);
+//        Supervisor.sendMessage("aggregator", ratioWithId);
+        return true;
     }
 
     @Override
-    public void onException(Actor<String> self, Exception exc) {
+    public void onException(Actor<TweetWithId> self, Exception exc) {
         exc.printStackTrace();
         self.die();
     }

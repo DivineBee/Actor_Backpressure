@@ -14,6 +14,12 @@ import java.net.URL;
  */
 public class SSEClientBehaviour implements Behaviour<String> {
 
+    private JSONBehaviour jsonBehaviour;
+
+    public SSEClientBehaviour(){
+        this.jsonBehaviour = new JSONBehaviour();
+    }
+
     // method responsible for sse stream handling and passing to next actor for processing
     @Override
     public boolean onReceive(Actor<String> self, String urlPath) throws Exception {
@@ -32,7 +38,6 @@ public class SSEClientBehaviour implements Behaviour<String> {
                 // if the data is available and readable then create new actor which will
                 // do next steps and will process the data from the stream
                 if(data != null && !data.isEmpty()){
-                    JSONBehaviour jsonBehaviour = new JSONBehaviour();
                     ActorFactory.createActor("jsonHandler", jsonBehaviour);
                     Supervisor.sendMessage("jsonHandler", data);
                 }
