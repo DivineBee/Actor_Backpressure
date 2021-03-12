@@ -5,6 +5,7 @@ import actor.model.Behaviour;
 import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import utilities.TweetWithAnalytics;
 import utilities.TweetWithId;
 
 /**
@@ -69,6 +70,13 @@ public class JSONBehaviour implements Behaviour<String> {
 //            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
 
             System.out.println(tweetWithId);
+
+            TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
+            transmittableFragment.setId(tweetWithId.getId());
+            transmittableFragment.setTweet(tweet);
+
+            Supervisor.sendMessage("aggregator", transmittableFragment);
+
         }
         return true;
     }

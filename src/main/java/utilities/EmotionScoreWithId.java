@@ -7,11 +7,11 @@ import java.util.UUID;
  * @created 08.03.2021 - 12:07
  * @project ActorProg2
  */
-public class EmotionWithId {
+public class EmotionScoreWithId {
     public UUID id;
     public int emotionScore;
 
-    public EmotionWithId(UUID id, int emotionScore) {
+    public EmotionScoreWithId(UUID id, int emotionScore) {
         this.id = id;
         this.emotionScore = emotionScore;
     }
@@ -26,7 +26,7 @@ public class EmotionWithId {
 
     @Override
     public String toString() {
-        return "EmotionWithId{" +
+        return "EmotionScoreWithId{" +
                 "id=" + id +
                 ", emotionScore=" + emotionScore +
                 '}';

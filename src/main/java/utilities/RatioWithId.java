@@ -11,7 +11,6 @@ public class RatioWithId {
     public UUID id;
     public double ratio;
 
-
     public RatioWithId(UUID id, double ratio) {
         this.id = id;
         this.ratio = ratio;

@@ -26,6 +26,10 @@ public class TweetWithId {
         }
     }
 
+    public TweetWithId() {
+
+    }
+
     public UUID getId() {
         return id;
     }

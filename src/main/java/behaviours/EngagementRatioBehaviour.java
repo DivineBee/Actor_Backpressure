@@ -4,6 +4,7 @@ import actor.model.Actor;
 import actor.model.Behaviour;
 import actor.model.Supervisor;
 import utilities.RatioWithId;
+import utilities.TweetWithAnalytics;
 import utilities.TweetWithId;
 
 /**
@@ -20,9 +21,14 @@ public class EngagementRatioBehaviour implements Behaviour<TweetWithId> {
         }catch (NullPointerException e){
             System.err.println("Can't calculate ratio -> 0 followers");
         }
-        RatioWithId ratioWithId = new RatioWithId(tweetWithId.getId(), engagementRatio);
-        System.out.println(ratioWithId);
-//        Supervisor.sendMessage("aggregator", ratioWithId);
+//        RatioWithId ratioWithId = new RatioWithId(tweetWithId.getId(), engagementRatio);
+//        System.out.println(ratioWithId);
+
+        TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
+        transmittableFragment.setId(tweetWithId.getId());
+        transmittableFragment.setRatio(engagementRatio);
+
+        Supervisor.sendMessage("aggregator", transmittableFragment);
         return true;
     }
 

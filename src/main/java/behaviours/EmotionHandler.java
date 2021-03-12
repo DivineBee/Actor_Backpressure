@@ -7,7 +7,10 @@ package behaviours;
 
 import actor.model.Actor;
 import actor.model.Behaviour;
-import utilities.EmotionWithId;
+import actor.model.DeadException;
+import actor.model.Supervisor;
+import utilities.EmotionScoreWithId;
+import utilities.TweetWithAnalytics;
 import utilities.TweetWithId;
 
 import java.io.BufferedReader;
@@ -59,9 +62,6 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
             }
         }
 
-//        for (String key : emotionsMap.keySet()) {
-//            System.out.println(key + ":" + emotionsMap.get(key));
-//        }
         reader.close();
 
         Set setOfKeys = emotionsMap.keySet();
@@ -74,16 +74,6 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
     public static int getEmotionScore(String tweet) {
         //  emotion score
         int score = 0;
-
-        // for every word/phrase from emotionMap do the next thing:
-//        for (String emotionWord : emotionsMap.keySet()) {
-//            String lowerCaseTweet = tweet.toLowerCase();
-//            // if the word/phrase is contained inside the tweet:
-//            if (lowerCaseTweet.contains(emotionWord)) {
-//                // total score = number of word appearances from emotionsMap * score number for that word
-//                score += amountOfEmotionWordAppearancesInTweet(tweet, emotionWord) * emotionsMap.get(emotionWord);
-//            }
-//        }
 
         String lowerCaseTweet = tweet.toLowerCase();
 
@@ -162,11 +152,17 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
     // Here is taken into consideration that some emotions are composed from more
     // than one word (e.g dont like)
     @Override
-    public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId){
+    public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId) throws DeadException {
         // id, score
-        EmotionWithId emotionWithId = new EmotionWithId(tweetWithId.getId(), getEmotionScore(tweetWithId.getTweet()));
-        System.out.println(emotionWithId);
-//        Supervisor.sendMessage("aggregator", emotionWithId);
+//        EmotionScoreWithId emotionWithId = new EmotionScoreWithId(tweetWithId.getId(), getEmotionScore(tweetWithId.getTweet()));
+//        System.out.println(emotionWithId);
+
+        TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
+        transmittableFragment.setId(tweetWithId.getId());
+        transmittableFragment.setEmotionScore(getEmotionScore(tweetWithId.getTweet()));
+
+        Supervisor.sendMessage("aggregator", transmittableFragment);
+
         return true;
     }
 
