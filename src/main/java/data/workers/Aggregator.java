@@ -2,7 +2,9 @@ package data.workers;
 
 import actor.model.Actor;
 import actor.model.Behaviour;
-import utilities.TweetWithAnalytics;
+import actor.model.Supervisor;
+import utilities.tweet.analytics.TweetWithAnalytics;
+
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -24,33 +26,30 @@ public class Aggregator implements Behaviour<TweetWithAnalytics> {
     public boolean onReceive(Actor<TweetWithAnalytics> self, TweetWithAnalytics tweetAnalyticsFragment) throws Exception {
         if (localHashMap.get(tweetAnalyticsFragment.getId()) != null) {
             TweetWithAnalytics record = localHashMap.get(tweetAnalyticsFragment.getId());
-            if (tweetAnalyticsFragment.getTweet() != null) {
-                record.setTweet(tweetAnalyticsFragment.getTweet());
-            } else if (tweetAnalyticsFragment.getEmotionScore() != null) {
-                record.setEmotionScore(tweetAnalyticsFragment.getEmotionScore());
-            } else if (tweetAnalyticsFragment.getRatio() != null) {
-                record.setRatio(tweetAnalyticsFragment.getRatio());
-            }
+            checkTweet(tweetAnalyticsFragment, record);
 
             if (record.checkForIntegrity()) {
-               // Supervisor.sendMessage("sink", record);
-               // localHashMap.remove(record);
-                System.out.println(record);
+                Supervisor.sendMessage("sink", record);
+                localHashMap.remove(record);
             }
         } else {
             TweetWithAnalytics newRecord = new TweetWithAnalytics();
             newRecord.setId(tweetAnalyticsFragment.getId());
-            if (tweetAnalyticsFragment.getTweet() != null) {
-                newRecord.setTweet(tweetAnalyticsFragment.getTweet());
-            } else if (tweetAnalyticsFragment.getEmotionScore() != null) {
-                newRecord.setEmotionScore(tweetAnalyticsFragment.getEmotionScore());
-            } else if (tweetAnalyticsFragment.getRatio() != null) {
-                newRecord.setRatio(tweetAnalyticsFragment.getRatio());
-            }
+            checkTweet(tweetAnalyticsFragment, newRecord);
+
             localHashMap.put(tweetAnalyticsFragment.getId(), newRecord);
         }
-
         return true;
+    }
+
+    public void checkTweet(TweetWithAnalytics tweetAnalyticsFragment, TweetWithAnalytics record) {
+        if (tweetAnalyticsFragment.getTweet() != null) {
+            record.setTweet(tweetAnalyticsFragment.getTweet());
+        } else if (tweetAnalyticsFragment.getEmotionScore() != null) {
+            record.setEmotionScore(tweetAnalyticsFragment.getEmotionScore());
+        } else if (tweetAnalyticsFragment.getRatio() != null) {
+            record.setRatio(tweetAnalyticsFragment.getRatio());
+        }
     }
 
     @Override

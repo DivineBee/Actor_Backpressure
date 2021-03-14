@@ -1,4 +1,4 @@
-package utilities;
+package utilities.tweet.analytics;
 
 import java.util.UUID;
 
@@ -26,9 +26,7 @@ public class TweetWithId {
         }
     }
 
-    public TweetWithId() {
-
-    }
+    public TweetWithId() { }
 
     public UUID getId() {
         return id;

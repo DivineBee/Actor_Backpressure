@@ -14,7 +14,7 @@ public class Actor<Message> implements Runnable {
     private boolean isHelperCreated = false; // does actor created a helper
     boolean isMaster = true; // is actor the master
 
-    private short MAX_MAILBOX_SIZE = 1000; // if actor's mailbox will be full it will create helper to handle upcoming messages
+    private short MAX_MAILBOX_SIZE = 10000; // if actor's mailbox will be full it will create helper to handle upcoming messages
     private String idActor; // actor identifier or name
 
     private volatile BlockingQueue<Message> mailbox; // mailbox of incoming messages

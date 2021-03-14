@@ -1,17 +1,16 @@
-package utilities;
+package utilities.user.analytics;
 
 import java.util.UUID;
 
 /**
  * @author Beatrice V.
- * @created 12.03.2021 - 11:41
+ * @created 14.03.2021 - 11:30
  * @project ActorProg2
  */
-public class TweetWithAnalytics {
+public class UserWithAnalytics {
     private UUID id;
-    private String tweet;
+    private String user;
     private Double ratio;
-    private Integer emotionScore;
 
     public UUID getId() {
         return id;
@@ -21,12 +20,12 @@ public class TweetWithAnalytics {
         this.id = id;
     }
 
-    public String getTweet() {
-        return tweet;
+    public String getUser() {
+        return user;
     }
 
-    public void setTweet(String tweet) {
-        this.tweet = tweet;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public Double getRatio() {
@@ -37,27 +36,18 @@ public class TweetWithAnalytics {
         this.ratio = ratio;
     }
 
-    public Integer getEmotionScore() {
-        return emotionScore;
-    }
-
-    public void setEmotionScore(Integer emotionScore) {
-        this.emotionScore = emotionScore;
-    }
-
     @Override
     public String toString() {
-        return "TweetWithAnalytics{" +
+        return "UserWithAnalytics{" +
                 "id=" + id +
-                ", tweet='" + tweet + '\'' +
+                ", user='" + user + '\'' +
                 ", ratio=" + ratio +
-                ", emotionScore=" + emotionScore +
                 '}';
     }
 
     //  check if record is full and if it can be transmitted further
     public boolean checkForIntegrity() {
-        if (this.tweet != null && ratio != null && emotionScore != null) {
+        if (this.user != null && ratio != null) {
             return true;
         } else {
             return false;

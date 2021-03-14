@@ -9,9 +9,8 @@ import actor.model.Actor;
 import actor.model.Behaviour;
 import actor.model.DeadException;
 import actor.model.Supervisor;
-import utilities.EmotionScoreWithId;
-import utilities.TweetWithAnalytics;
-import utilities.TweetWithId;
+import utilities.tweet.analytics.TweetWithAnalytics;
+import utilities.tweet.analytics.TweetWithId;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -153,10 +152,6 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
     // than one word (e.g dont like)
     @Override
     public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId) throws DeadException {
-        // id, score
-//        EmotionScoreWithId emotionWithId = new EmotionScoreWithId(tweetWithId.getId(), getEmotionScore(tweetWithId.getTweet()));
-//        System.out.println(emotionWithId);
-
         TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
         transmittableFragment.setId(tweetWithId.getId());
         transmittableFragment.setEmotionScore(getEmotionScore(tweetWithId.getTweet()));

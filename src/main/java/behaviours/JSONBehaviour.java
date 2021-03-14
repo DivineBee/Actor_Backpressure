@@ -5,8 +5,10 @@ import actor.model.Behaviour;
 import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import utilities.TweetWithAnalytics;
-import utilities.TweetWithId;
+import utilities.tweet.analytics.TweetWithAnalytics;
+import utilities.tweet.analytics.TweetWithId;
+import utilities.user.analytics.UserWithAnalytics;
+import utilities.user.analytics.UserWithId;
 
 /**
  * @author Beatrice V.
@@ -16,9 +18,12 @@ import utilities.TweetWithId;
 public class JSONBehaviour implements Behaviour<String> {
     public static String tweet = null;
     public static String user = null;
+    public static int userFollowers = 0;
+    public static int userFriends = 0;
     public static int favorites = 0;
     public static int followers = 0;
     public static int numberOfRetweets = 0;
+    public static int numberOfStatuses = 0;
 
     @Override
     public boolean onReceive(Actor<String> self, String data) throws Exception {
@@ -45,6 +50,15 @@ public class JSONBehaviour implements Behaviour<String> {
             JsonNode userNode = jsonNode.get("message").get("tweet").get("user").get("screen_name");
             user = userNode.asText();
 
+            JsonNode userFollowersNode = jsonNode.get("message").get("tweet").get("user").get("followers_count");
+            userFollowers = userFollowersNode.asInt();
+
+            JsonNode userFriendsNode = jsonNode.get("message").get("tweet").get("user").get("friends_count");
+            userFriends = userFriendsNode.asInt();
+
+            JsonNode statusesCountNode = jsonNode.get("message").get("tweet").get("user").get("statuses_count");
+            numberOfStatuses = statusesCountNode.asInt();
+
             if (data.contains("retweeted_status")) {
                 // extract retweet and save to variable
                 JsonNode retweetFavoritesNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("user").get("favourites_count");
@@ -59,12 +73,11 @@ public class JSONBehaviour implements Behaviour<String> {
                 numberOfRetweets = retweetCountNode.asInt();
             }
             //System.out.println("DATA" + data + favorites);
-            // print beautifully the output
-
+            //--------------------
+            // Tweet related
             //1st field id, tweet
             TweetWithId tweetWithId = new TweetWithId(tweet, favorites, followers, numberOfRetweets);
 
-//            Supervisor.sendMessage("aggregator", tweetWithId);
             Supervisor.sendMessage("emotionScoreCalculator", tweetWithId);
             Supervisor.sendMessage("tweetEngagementRatio", tweetWithId);
 //            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
@@ -76,7 +89,17 @@ public class JSONBehaviour implements Behaviour<String> {
             transmittableFragment.setTweet(tweet);
 
             Supervisor.sendMessage("aggregator", transmittableFragment);
-
+            //-----------------
+            // User related
+//            UserWithId userWithId = new UserWithId(user, userFriends, userFollowers, numberOfStatuses);
+//
+//            Supervisor.sendMessage("userEngagementRatio", userWithId);
+//
+//            UserWithAnalytics userFragment = new UserWithAnalytics();
+//            userFragment.setId(userWithId.getId());
+//            userFragment.setUser(user);
+//
+//            Supervisor.sendMessage("aggregator", userFragment);
         }
         return true;
     }
