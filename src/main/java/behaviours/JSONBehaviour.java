@@ -5,10 +5,8 @@ import actor.model.Behaviour;
 import actor.model.Supervisor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import utilities.tweet.analytics.TweetWithAnalytics;
-import utilities.tweet.analytics.TweetWithId;
-import utilities.user.analytics.UserWithAnalytics;
-import utilities.user.analytics.UserWithId;
+import utilities.data.analytics.DataWithAnalytics;
+import utilities.data.analytics.DataWithId;
 
 /**
  * @author Beatrice V.
@@ -73,33 +71,23 @@ public class JSONBehaviour implements Behaviour<String> {
                 numberOfRetweets = retweetCountNode.asInt();
             }
             //System.out.println("DATA" + data + favorites);
-            //--------------------
-            // Tweet related
-            //1st field id, tweet
-            TweetWithId tweetWithId = new TweetWithId(tweet, favorites, followers, numberOfRetweets);
 
-            Supervisor.sendMessage("emotionScoreCalculator", tweetWithId);
-            Supervisor.sendMessage("tweetEngagementRatio", tweetWithId);
+            DataWithId dataWithId = new DataWithId(tweet, user, favorites, numberOfRetweets, followers, userFriends, userFollowers, numberOfStatuses);
+
+            Supervisor.sendMessage("emotionScoreCalculator", dataWithId);
+            Supervisor.sendMessage("tweetEngagementRatio", dataWithId);
+
+            Supervisor.sendMessage("userEngagementRatio", dataWithId);
 //            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
 
-            System.out.println(tweetWithId);
+            DataWithAnalytics transmittableFragment = new DataWithAnalytics();
+            transmittableFragment.setId(dataWithId.getId());
+            transmittableFragment.setTweet(dataWithId.getTweet());
+            transmittableFragment.setUser(dataWithId.getUser());
 
-            TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
-            transmittableFragment.setId(tweetWithId.getId());
-            transmittableFragment.setTweet(tweet);
+           // System.out.println("FR----" + transmittableFragment);
 
             Supervisor.sendMessage("aggregator", transmittableFragment);
-            //-----------------
-            // User related
-//            UserWithId userWithId = new UserWithId(user, userFriends, userFollowers, numberOfStatuses);
-//
-//            Supervisor.sendMessage("userEngagementRatio", userWithId);
-//
-//            UserWithAnalytics userFragment = new UserWithAnalytics();
-//            userFragment.setId(userWithId.getId());
-//            userFragment.setUser(user);
-//
-//            Supervisor.sendMessage("aggregator", userFragment);
         }
         return true;
     }

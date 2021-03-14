@@ -3,7 +3,7 @@ package data.workers;
 import actor.model.Actor;
 import actor.model.Behaviour;
 import utilities.MongoUtility;
-import utilities.tweet.analytics.TweetWithAnalytics;
+import utilities.data.analytics.DataWithAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,13 +13,13 @@ import java.util.List;
  * @created 12.03.2021 - 10:20
  * @project ActorProg2
  */
-public class Sink implements Behaviour<TweetWithAnalytics> {
+public class Sink implements Behaviour<DataWithAnalytics> {
     private MongoUtility mongoUtility;
     private long start = 0;
     private long end = 0;
     private boolean isSent = true;
 
-    private List<TweetWithAnalytics> recordsToDB = new ArrayList<TweetWithAnalytics>();
+    private List<DataWithAnalytics> recordsToDB = new ArrayList<DataWithAnalytics>();
     private static final int BATCH_SIZE = 128;
 
 
@@ -29,7 +29,7 @@ public class Sink implements Behaviour<TweetWithAnalytics> {
     }
 
     @Override
-    public boolean onReceive(Actor<TweetWithAnalytics> self, TweetWithAnalytics msg) throws Exception {
+    public boolean onReceive(Actor<DataWithAnalytics> self, DataWithAnalytics msg) throws Exception {
         if (isSent) {
             start = System.currentTimeMillis();
             end = (long) (start + 0.2 * 1000);
@@ -49,7 +49,7 @@ public class Sink implements Behaviour<TweetWithAnalytics> {
     }
 
     @Override
-    public void onException(Actor<TweetWithAnalytics> self, Exception exc) {
+    public void onException(Actor<DataWithAnalytics> self, Exception exc) {
         exc.printStackTrace();
         self.die();
     }

@@ -10,7 +10,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import utilities.tweet.analytics.TweetWithAnalytics;
+import utilities.data.analytics.DataWithAnalytics;
 
 import java.util.List;
 
@@ -32,44 +32,34 @@ public class MongoUtility {
     }
 
     // Update elements if are present or insert if there are no such records in db
-    public void insertDataToDB(List<TweetWithAnalytics> tweetRecords) throws Exception {
-        int size = tweetRecords.size();
+    public void insertDataToDB(List<DataWithAnalytics> dataRecords) throws Exception {
+        int size = dataRecords.size();
 
-        if(size > 0) {
+        if (size > 0) {
             establishConnectionToCollection("tweets");
-            for(int i = 0; i < size; i++) {
-                //  get each element individually
-                TweetWithAnalytics currentRecord = tweetRecords.get(i);
-                Document currentDoc = new Document();
-                currentDoc.put("id", currentRecord.getId());
-                currentDoc.put("tweet", currentRecord.getTweet());
-                currentDoc.put("ratio", currentRecord.getRatio());
-                currentDoc.put("score", currentRecord.getEmotionScore());
-                System.out.println("HERE------"+currentDoc);
-                collection.insertOne(currentDoc);
+            for (int i = 0; i < size; i++) {
+                DataWithAnalytics currentRecord = dataRecords.get(i);
+                Document tweetDoc = new Document();
+                tweetDoc.put("id", currentRecord.getId());
+                tweetDoc.put("tweet", currentRecord.getTweet());
+                tweetDoc.put("emotionRatio", currentRecord.getEmotionRatio());
+                tweetDoc.put("score", currentRecord.getEmotionScore());
+                System.out.println("TWEET------" + tweetDoc);
+                collection.insertOne(tweetDoc);
             }
-            /*establishConnectionToCollection("tweets");
-            for(int i = 0; i < size; i++) {
-                //  get each element individually
-                TweetWithAnalytics currentRecord = tweetRecords.get(i);
 
-                //  insert if new and update if already present element in DB
-               *//* collection.updateOne(Filters.eq("name", currentCurrency.getTargetName()),
-                        new Document("$set", new Document().
-                                append("link", currentCurrency.getLink()).
-                                append("value", currentCurrency.getExchangeRate())),
-                        new UpdateOptions().upsert(true));
-                *//*
-                Document currentDoc = new Document();
-                currentDoc.put("id", currentRecord.getId());
-                currentDoc.put("tweet", currentRecord.getTweet());
-                currentDoc.put("ratio", currentRecord.getRatio());
-                currentDoc.put("score", currentRecord.getEmotionScore());
-                System.out.println("HERE------"+currentDoc);
-                collection.insertOne(currentDoc);
-            }*/
+            establishConnectionToCollection("users");
+            for (int i = 0; i < size; i++) {
+                DataWithAnalytics currentRecord = dataRecords.get(i);
+                Document userDoc = new Document();
+                userDoc.put("id", currentRecord.getId());
+                userDoc.put("user", currentRecord.getUser());
+                userDoc.put("userRatio", currentRecord.getUserRatio());
+                System.out.println("USER------" + userDoc);
+                collection.insertOne(userDoc);
+            }
         } else {
-            throw new Exception("empty list sent to upsert");
+            throw new Exception("empty list sent to collection");
         }
     }
 }

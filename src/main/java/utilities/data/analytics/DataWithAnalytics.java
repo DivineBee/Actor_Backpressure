@@ -1,4 +1,4 @@
-package utilities.tweet.analytics;
+package utilities.data.analytics;
 
 import java.util.UUID;
 
@@ -7,10 +7,12 @@ import java.util.UUID;
  * @created 12.03.2021 - 11:41
  * @project ActorProg2
  */
-public class TweetWithAnalytics {
+public class DataWithAnalytics {
     private UUID id;
     private String tweet;
-    private Double ratio;
+    private String user;
+    private Double emotionRatio;
+    private Double userRatio;
     private Integer emotionScore;
 
     public UUID getId() {
@@ -29,12 +31,12 @@ public class TweetWithAnalytics {
         this.tweet = tweet;
     }
 
-    public Double getRatio() {
-        return ratio;
+    public Double getEmotionRatio() {
+        return emotionRatio;
     }
 
-    public void setRatio(Double ratio) {
-        this.ratio = ratio;
+    public void setEmotionRatio(Double emotionRatio) {
+        this.emotionRatio = emotionRatio;
     }
 
     public Integer getEmotionScore() {
@@ -45,19 +47,37 @@ public class TweetWithAnalytics {
         this.emotionScore = emotionScore;
     }
 
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public Double getUserRatio() {
+        return userRatio;
+    }
+
+    public void setUserRatio(Double userRatio) {
+        this.userRatio = userRatio;
+    }
+
     @Override
     public String toString() {
-        return "TweetWithAnalytics{" +
+        return "DataWithAnalytics{" +
                 "id=" + id +
                 ", tweet='" + tweet + '\'' +
-                ", ratio=" + ratio +
+                ", user='" + user + '\'' +
+                ", emotionRatio=" + emotionRatio +
+                ", userRatio=" + userRatio +
                 ", emotionScore=" + emotionScore +
                 '}';
     }
 
     //  check if record is full and if it can be transmitted further
     public boolean checkForIntegrity() {
-        if (this.tweet != null && ratio != null && emotionScore != null) {
+        if (this.tweet != null && this.emotionRatio != null && this.emotionScore != null && this.user != null && this.userRatio != null) {
             return true;
         } else {
             return false;

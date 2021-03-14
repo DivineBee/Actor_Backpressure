@@ -9,8 +9,8 @@ import actor.model.Actor;
 import actor.model.Behaviour;
 import actor.model.DeadException;
 import actor.model.Supervisor;
-import utilities.tweet.analytics.TweetWithAnalytics;
-import utilities.tweet.analytics.TweetWithId;
+import utilities.data.analytics.DataWithAnalytics;
+import utilities.data.analytics.DataWithId;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,7 +20,7 @@ import java.util.Set;
 
 import static behaviours.JSONBehaviour.user;
 
-public class EmotionHandler implements Behaviour<TweetWithId> {
+public class EmotionHandler implements Behaviour<DataWithId> {
     // key-value pairs for emotions with their points
     public static final HashMap<String, Integer> emotionsMap = new HashMap<String, Integer>();
 
@@ -103,7 +103,6 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
         return score;
     }
 
-
     public static int amountOfEmotionWordAppearancesInTweet(String tweet, String emotionWord) {
         String reviewableFragment = "";
         int counter = 0;
@@ -151,10 +150,10 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
     // Here is taken into consideration that some emotions are composed from more
     // than one word (e.g dont like)
     @Override
-    public boolean onReceive(Actor<TweetWithId> self, TweetWithId tweetWithId) throws DeadException {
-        TweetWithAnalytics transmittableFragment = new TweetWithAnalytics();
-        transmittableFragment.setId(tweetWithId.getId());
-        transmittableFragment.setEmotionScore(getEmotionScore(tweetWithId.getTweet()));
+    public boolean onReceive(Actor<DataWithId> self, DataWithId dataWithId) throws DeadException {
+        DataWithAnalytics transmittableFragment = new DataWithAnalytics();
+        transmittableFragment.setId(dataWithId.getId());
+        transmittableFragment.setEmotionScore(getEmotionScore(dataWithId.getTweet()));
 
         Supervisor.sendMessage("aggregator", transmittableFragment);
 
@@ -162,7 +161,7 @@ public class EmotionHandler implements Behaviour<TweetWithId> {
     }
 
     @Override
-    public void onException(Actor<TweetWithId> self, Exception exc) {
+    public void onException(Actor<DataWithId> self, Exception exc) {
         exc.printStackTrace();
         self.die();
     }
