@@ -7,6 +7,10 @@ import java.util.UUID;
  * @created 12.03.2021 - 11:41
  * @project ActorProg2
  */
+
+// This class contains all necessary data which can be passed to aggregator
+// but also we admit that not full-fledged ones may come from different actors (objects which
+// don't contain whole information but so called "fragments of data")
 public class DataWithAnalytics {
     private UUID id;
     private String tweet;

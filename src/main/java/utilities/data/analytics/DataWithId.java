@@ -7,6 +7,11 @@ import java.util.UUID;
  * @created 08.03.2021 - 12:02
  * @project ActorProg2
  */
+
+// Contains primary information for starting processing. Since this type of information is sufficiently typed
+// and its used by multiple actors then we use it for primary transmission. For example to emotion score and ratio.
+// Because emotion score and ratio receive only one type of data but aggregator receive ambiguous type of data(of
+// different kind)
 public class DataWithId {
     private UUID id;
     private String tweet;
@@ -49,7 +54,8 @@ public class DataWithId {
         }
     }
 
-    public DataWithId() { }
+    public DataWithId() {
+    }
 
     public UUID getId() {
         return id;

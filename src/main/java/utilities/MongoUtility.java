@@ -15,8 +15,11 @@ import utilities.data.analytics.DataWithAnalytics;
 import java.util.List;
 
 public class MongoUtility {
+    // initialize up mongo client
     private MongoClient client;
+    // initialize the database name
     private MongoDatabase database;
+    // initialize the collection
     private MongoCollection<Document> collection;
 
     // Establish connection to database
@@ -36,6 +39,8 @@ public class MongoUtility {
         int size = dataRecords.size();
 
         if (size > 0) {
+            // establish connection to the tweets collection which will contain
+            // id, tweet, emotion ratio and score. Then insert it to collection
             establishConnectionToCollection("tweets");
             for (int i = 0; i < size; i++) {
                 DataWithAnalytics currentRecord = dataRecords.get(i);
@@ -44,10 +49,10 @@ public class MongoUtility {
                 tweetDoc.put("tweet", currentRecord.getTweet());
                 tweetDoc.put("emotionRatio", currentRecord.getEmotionRatio());
                 tweetDoc.put("score", currentRecord.getEmotionScore());
-                System.out.println("TWEET------" + tweetDoc);
                 collection.insertOne(tweetDoc);
             }
-
+            // establish connection to the users collection which will contain
+            // id, user, user ratio and then insert it to collection
             establishConnectionToCollection("users");
             for (int i = 0; i < size; i++) {
                 DataWithAnalytics currentRecord = dataRecords.get(i);
@@ -55,7 +60,6 @@ public class MongoUtility {
                 userDoc.put("id", currentRecord.getId());
                 userDoc.put("user", currentRecord.getUser());
                 userDoc.put("userRatio", currentRecord.getUserRatio());
-                System.out.println("USER------" + userDoc);
                 collection.insertOne(userDoc);
             }
         } else {

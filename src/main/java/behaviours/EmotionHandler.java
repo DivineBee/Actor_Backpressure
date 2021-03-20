@@ -76,8 +76,8 @@ public class EmotionHandler implements Behaviour<DataWithId> {
 
         String lowerCaseTweet = tweet.toLowerCase();
 
-        for(int i = 0; i < emotionWordsArray.length; i++) {
-            if(lowerCaseTweet.contains(emotionWordsArray[i])) {
+        for (int i = 0; i < emotionWordsArray.length; i++) {
+            if (lowerCaseTweet.contains(emotionWordsArray[i])) {
                 score += amountOfEmotionWordAppearancesInTweet(tweet, emotionWordsArray[i]) * emotionsMap.get(emotionWordsArray[i]);
             }
         }
@@ -99,7 +99,6 @@ public class EmotionHandler implements Behaviour<DataWithId> {
         } else {
             System.out.println("\n" + user + ": CAN'T IDENTIFY EMOTION");
         }
-
         return score;
     }
 
@@ -109,16 +108,16 @@ public class EmotionHandler implements Behaviour<DataWithId> {
 
         for (int startIndex = 0; startIndex < tweet.length() - emotionWord.length(); startIndex++) {
             int endingIndex = startIndex + emotionWord.length();
-            if (startIndex != 0 && endingIndex != tweet.length()){
-                if (verifyWordBounds(tweet.charAt(startIndex - 1), tweet.charAt(endingIndex))){
+            if (startIndex != 0 && endingIndex != tweet.length()) {
+                if (verifyWordBounds(tweet.charAt(startIndex - 1), tweet.charAt(endingIndex))) {
                     reviewableFragment = tweet.substring(startIndex, endingIndex);
                     //System.out.println("HERE " + reviewableFragment + " | " + emotionWord);
                     if (reviewableFragment.equalsIgnoreCase(emotionWord)) {
                         counter++;
                     }
                 }
-            } else if(endingIndex != tweet.length()-1){
-                if(verifyWordOneWayBound(tweet.charAt(endingIndex + 1))){
+            } else if (endingIndex != tweet.length() - 1) {
+                if (verifyWordOneWayBound(tweet.charAt(endingIndex + 1))) {
                     reviewableFragment = tweet.substring(startIndex, endingIndex);
                     if (reviewableFragment.equalsIgnoreCase(emotionWord)) {
                         counter++;
@@ -132,7 +131,7 @@ public class EmotionHandler implements Behaviour<DataWithId> {
     public static boolean verifyWordBounds(char starting, char ending) {
         if (starting == ' ' || starting == '.' || starting == ',' || starting == '!'
                 || starting == '?' || starting == ';' || starting == '#') {
-            if(ending == ' ' || ending == '.' || ending == ',' || ending == '!' || ending == '?' || ending == ';'){
+            if (ending == ' ' || ending == '.' || ending == ',' || ending == '!' || ending == '?' || ending == ';') {
                 return true;
             }
         }
@@ -149,12 +148,24 @@ public class EmotionHandler implements Behaviour<DataWithId> {
     // Mapping of emotions to keys and their points as values.
     // Here is taken into consideration that some emotions are composed from more
     // than one word (e.g dont like)
+
+    /**
+     * In onReceive() method, a chunk of data with unique id is received and
+     * a transmittable fragment is formed which will get the id of the data
+     * and will calculate and pass tweets' emotion score to the aggregator.
+     * @param self Actor
+     * @param dataWithId message which contains unique id per chunk
+     * @throws DeadException
+     */
     @Override
     public boolean onReceive(Actor<DataWithId> self, DataWithId dataWithId) throws DeadException {
+        // A new transmittable fragment is initialized
         DataWithAnalytics transmittableFragment = new DataWithAnalytics();
+        // Then it gets the unique id of the fragment
         transmittableFragment.setId(dataWithId.getId());
+        // and then sets the emotion score for that fragment
         transmittableFragment.setEmotionScore(getEmotionScore(dataWithId.getTweet()));
-
+        // which later is transmitted to aggregator
         Supervisor.sendMessage("aggregator", transmittableFragment);
 
         return true;

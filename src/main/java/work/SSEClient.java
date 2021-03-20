@@ -43,12 +43,12 @@ public class SSEClient {
         String eventType = "message";
         StringBuilder payLoad = new StringBuilder();
 
-        while(readEvent) {
+        while (readEvent) {
             StringBuilder sb = new StringBuilder();
             while (!isEol(sb)) {
                 int red = in.read();
                 if (red == -1) throw new EOFException("end of stream");
-                char c = (char)red;
+                char c = (char) red;
                 sb.append(c);
             }
 

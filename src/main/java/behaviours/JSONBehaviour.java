@@ -70,23 +70,26 @@ public class JSONBehaviour implements Behaviour<String> {
                 JsonNode retweetCountNode = jsonNode.get("message").get("tweet").get("retweeted_status").get("retweet_count");
                 numberOfRetweets = retweetCountNode.asInt();
             }
-            //System.out.println("DATA" + data + favorites);
-
+            // Here a chunk of data is initialized with all the desired fields parsed from stream
             DataWithId dataWithId = new DataWithId(tweet, user, favorites, numberOfRetweets, followers, userFriends, userFollowers, numberOfStatuses);
 
+            // Here 76-79 supervisor is sending to other actors this data so each actor
+            // will process it and send further to aggregator
             Supervisor.sendMessage("emotionScoreCalculator", dataWithId);
             Supervisor.sendMessage("tweetEngagementRatio", dataWithId);
-
             Supervisor.sendMessage("userEngagementRatio", dataWithId);
-//            System.out.println("USER: " + user + " | " + "TWEET: " + tweet + " | " + "SCORE: " + EmotionHandler.getEmotionScore(tweet));
 
+            // from this class we are already ready to transmit 2 fragments of data
+            // regarding tweet and user directly to aggregator because they don't need
+            // any additional processing
             DataWithAnalytics transmittableFragment = new DataWithAnalytics();
             transmittableFragment.setId(dataWithId.getId());
+            // set the tweet which will be transmitted
             transmittableFragment.setTweet(dataWithId.getTweet());
+            // set the user which will be transmitted
             transmittableFragment.setUser(dataWithId.getUser());
 
-           // System.out.println("FR----" + transmittableFragment);
-
+            // send the composed fragment to aggregator
             Supervisor.sendMessage("aggregator", transmittableFragment);
         }
         return true;

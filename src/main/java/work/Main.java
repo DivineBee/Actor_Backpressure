@@ -16,6 +16,7 @@ import data.workers.Sink;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
+        // Section of initialization
         SSEClientBehaviour sseClientBehaviour = new SSEClientBehaviour();
         EmotionHandler emotionHandler = new EmotionHandler("B:\\\\PROGRAMMING\\\\PROJECTS\\\\ActorProg1\\\\src\\\\main\\\\resources\\\\emotions.txt");
         TweetEngagementRatioBehaviour ratioBehaviour = new TweetEngagementRatioBehaviour();
@@ -23,21 +24,20 @@ public class Main {
         Aggregator aggregator = new Aggregator();
         Sink sink = new Sink("localhost", 27017, "Tweets");
 
+        // Section of creating the actors
+        ActorFactory.createActor("firstSSEClient", sseClientBehaviour);
+        ActorFactory.createActor("secondSSEClient", sseClientBehaviour);
+
         ActorFactory.createActor("tweetEngagementRatio", ratioBehaviour);
         ActorFactory.createActor("userEngagementRatio", userRatioBehaviour);
         ActorFactory.createActor("emotionScoreCalculator", emotionHandler);
-
-        ActorFactory.createActor("firstSSEClient", sseClientBehaviour);
-        ActorFactory.createActor("secondSSEClient", sseClientBehaviour);
         ActorFactory.createActor("emotionHandler", emotionHandler);
 
         ActorFactory.createActor("aggregator", aggregator);
         ActorFactory.createActor("sink", sink);
-        //ActorFactory.createActor("ratioBehaviour", ratio);
 
+        // Section of sending messages for reading the 2 streams
         Supervisor.sendMessage("firstSSEClient", "http://localhost:4000/tweets/1");
         Supervisor.sendMessage("secondSSEClient", "http://localhost:4000/tweets/2");
-//        Supervisor.sendMessage("emotionHandler", "B:\\PROGRAMMING\\PROJECTS\\ActorProg1\\src\\main\\resources\\emotions.txt");
-       // Supervisor.sendMessage("ratioBehaviour", EmotionHandler.getEmotionScore(tweet));
     }
 }

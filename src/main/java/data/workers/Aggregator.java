@@ -34,7 +34,21 @@ public class Aggregator implements Behaviour<DataWithAnalytics> {
             // to perform operations on it
             DataWithAnalytics record = localHashMap.get(dataAnalyticsFragment.getId());
             // we check what data is in the transmitted fragment and transfer it to this record
-            checkData(dataAnalyticsFragment, record);
+            if (dataAnalyticsFragment.getTweet() != null) {
+                record.setTweet(dataAnalyticsFragment.getTweet());
+            }
+            if (dataAnalyticsFragment.getEmotionScore() != null) {
+                record.setEmotionScore(dataAnalyticsFragment.getEmotionScore());
+            }
+            if (dataAnalyticsFragment.getEmotionRatio() != null) {
+                record.setEmotionRatio(dataAnalyticsFragment.getEmotionRatio());
+            }
+            if (dataAnalyticsFragment.getUser() != null) {
+                record.setUser(dataAnalyticsFragment.getUser());
+            }
+            if (dataAnalyticsFragment.getUserRatio() != null) {
+                record.setUserRatio(dataAnalyticsFragment.getUserRatio());
+            }
             // then check the data for integrity, if it passes the check then it can be sent
             // to the sink and removed from local map
             if (record.checkForIntegrity()) {
@@ -45,7 +59,22 @@ public class Aggregator implements Behaviour<DataWithAnalytics> {
             // else just create new record and place new incoming data
             DataWithAnalytics newRecord = new DataWithAnalytics();
             newRecord.setId(dataAnalyticsFragment.getId());
-            checkData(dataAnalyticsFragment, newRecord);
+            if (dataAnalyticsFragment.getTweet() != null) {
+                newRecord.setTweet(dataAnalyticsFragment.getTweet());
+            }
+            if (dataAnalyticsFragment.getEmotionScore() != null) {
+                newRecord.setEmotionScore(dataAnalyticsFragment.getEmotionScore());
+            }
+            if (dataAnalyticsFragment.getEmotionRatio() != null) {
+                newRecord.setEmotionRatio(dataAnalyticsFragment.getEmotionRatio());
+            }
+            if (dataAnalyticsFragment.getUser() != null) {
+                newRecord.setUser(dataAnalyticsFragment.getUser());
+            }
+            if (dataAnalyticsFragment.getUserRatio() == null) {
+                newRecord.setUserRatio(dataAnalyticsFragment.getUserRatio());
+            }
+            localHashMap.put(dataAnalyticsFragment.getId(), newRecord);
         }
         return true;
     }

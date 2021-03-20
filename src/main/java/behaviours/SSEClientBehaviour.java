@@ -16,7 +16,7 @@ public class SSEClientBehaviour implements Behaviour<String> {
 
     private JSONBehaviour jsonBehaviour;
 
-    public SSEClientBehaviour(){
+    public SSEClientBehaviour() {
         this.jsonBehaviour = new JSONBehaviour();
     }
 
@@ -31,13 +31,13 @@ public class SSEClientBehaviour implements Behaviour<String> {
                 String data = evt.data;
 
                 // if data contains panic message then actor is self-killing
-                if(data.contains("{\"message\": panic}")) {
+                if (data.contains("{\"message\": panic}")) {
                     System.out.println("Actor died x_x");
                     self.die();
                 }
                 // if the data is available and readable then create new actor which will
                 // do next steps and will process the data from the stream
-                if(data != null && !data.isEmpty()){
+                if (data != null && !data.isEmpty()) {
                     ActorFactory.createActor("jsonHandler", jsonBehaviour);
                     Supervisor.sendMessage("jsonHandler", data);
                 }
