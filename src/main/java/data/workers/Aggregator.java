@@ -3,7 +3,6 @@ package data.workers;
 import actor.model.Actor;
 import actor.model.Behaviour;
 import actor.model.Supervisor;
-import org.bson.io.BsonOutput;
 import utilities.data.analytics.DataWithAnalytics;
 
 import java.util.HashMap;
@@ -15,75 +14,57 @@ import java.util.UUID;
  * @project ActorProg2
  */
 public class Aggregator implements Behaviour<DataWithAnalytics> {
-    //DataWithId tweetWithId = new DataWithId();
+    // local storage for incoming fragments
     HashMap<UUID, DataWithAnalytics> localHashMap;
 
+    // constructor
     public Aggregator() throws Exception {
         localHashMap = new HashMap<>();
         DataWithAnalytics.class.getClass();
     }
 
+    // Aggregator receives and then combines all the fragments which arrive together and merge them in one chunk
+    // which will be sent to the sink.
     @Override
     public boolean onReceive(Actor<DataWithAnalytics> self, DataWithAnalytics dataAnalyticsFragment) throws Exception {
-        if (dataAnalyticsFragment.getUser() != null) {
-            System.out.println(dataAnalyticsFragment);
-        }
+        // check if there is such an entry in the local hashmap. If so, then the execution of the
+        // code inside the if starts
         if (localHashMap.get(dataAnalyticsFragment.getId()) != null) {
+            // since we have already checked and found such an entry with such an id in the hashmap, we pull it out
+            // to perform operations on it
             DataWithAnalytics record = localHashMap.get(dataAnalyticsFragment.getId());
-            if (dataAnalyticsFragment.getTweet() != null) {
-                record.setTweet(dataAnalyticsFragment.getTweet());
-            }
-            if (dataAnalyticsFragment.getEmotionScore() != null) {
-                record.setEmotionScore(dataAnalyticsFragment.getEmotionScore());
-            }
-            if (dataAnalyticsFragment.getEmotionRatio() != null) {
-                record.setEmotionRatio(dataAnalyticsFragment.getEmotionRatio());
-            }
-            if (dataAnalyticsFragment.getUser() != null) {
-                record.setUser(dataAnalyticsFragment.getUser());
-            }
-            if (dataAnalyticsFragment.getUserRatio() != null) {
-                record.setUserRatio(dataAnalyticsFragment.getUserRatio());
-            }
-
+            // we check what data is in the transmitted fragment and transfer it to this record
+            checkData(dataAnalyticsFragment, record);
+            // then check the data for integrity, if it passes the check then it can be sent
+            // to the sink and removed from local map
             if (record.checkForIntegrity()) {
                 Supervisor.sendMessage("sink", record);
                 localHashMap.remove(record);
-                System.out.println("RECORD " + record);
             }
         } else {
+            // else just create new record and place new incoming data
             DataWithAnalytics newRecord = new DataWithAnalytics();
             newRecord.setId(dataAnalyticsFragment.getId());
-            if (dataAnalyticsFragment.getTweet() != null) {
-                newRecord.setTweet(dataAnalyticsFragment.getTweet());
-            }
-            if (dataAnalyticsFragment.getEmotionScore() != null) {
-                newRecord.setEmotionScore(dataAnalyticsFragment.getEmotionScore());
-            }
-            if (dataAnalyticsFragment.getEmotionRatio() != null) {
-                newRecord.setEmotionRatio(dataAnalyticsFragment.getEmotionRatio());
-            }
-            if (dataAnalyticsFragment.getUser() != null) {
-                newRecord.setUser(dataAnalyticsFragment.getUser());
-            }
-            if (dataAnalyticsFragment.getUserRatio() == null) {
-                newRecord.setUserRatio(dataAnalyticsFragment.getUserRatio());
-            }
-            localHashMap.put(dataAnalyticsFragment.getId(), newRecord);
+            checkData(dataAnalyticsFragment, newRecord);
         }
         return true;
     }
 
+    // Check what data is in the transmitted fragment and transfer it to this record
     public void checkData(DataWithAnalytics dataAnalyticsFragment, DataWithAnalytics record) {
         if (dataAnalyticsFragment.getTweet() != null) {
             record.setTweet(dataAnalyticsFragment.getTweet());
-        } else if (dataAnalyticsFragment.getEmotionScore() != null) {
+        }
+        if (dataAnalyticsFragment.getEmotionScore() != null) {
             record.setEmotionScore(dataAnalyticsFragment.getEmotionScore());
-        } else if (dataAnalyticsFragment.getEmotionRatio() != null) {
+        }
+        if (dataAnalyticsFragment.getEmotionRatio() != null) {
             record.setEmotionRatio(dataAnalyticsFragment.getEmotionRatio());
-        } else if (dataAnalyticsFragment.getUser() != null) {
+        }
+        if (dataAnalyticsFragment.getUser() != null) {
             record.setUser(dataAnalyticsFragment.getUser());
-        } else if (dataAnalyticsFragment.getUserRatio() != null) {
+        }
+        if (dataAnalyticsFragment.getUserRatio() != null) {
             record.setUserRatio(dataAnalyticsFragment.getUserRatio());
         }
     }
